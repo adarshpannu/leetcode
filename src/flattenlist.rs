@@ -1,6 +1,7 @@
 #![allow(warnings)]
 
-//   [[1], 2, [[3, 4], 5], [[[]]], [[[6]]], 7, 8, []]
+// Ref: http://rosettacode.org/wiki/Flatten_a_list
+
 use std::fmt;
 
 #[derive(Debug)]
@@ -29,6 +30,21 @@ impl List {
     fn len(&self) -> usize {
         self.elements.len()
     }
+
+    fn flatmap(&self) -> Vec<i32> {
+        let mut retval: Vec<i32> = vec![];
+        self.flatmap0(&mut retval);
+        retval
+    }
+
+    fn flatmap0(&self, retval: &mut Vec<i32>) {
+        for elem in &self.elements {
+            match elem {
+                Elem::int(int) => retval.push(*int),
+                Elem::list(ref list) => list.flatmap0(retval),
+            }
+        }
+    }
 }
 
 impl fmt::Debug for List {
@@ -54,11 +70,11 @@ fn run() {
     let mut stack: Vec<List>;
 
     cur_list = List::new();
-    stack = vec!();
+    stack = vec![];
 
     for ch in s.chars() {
         match ch {
-            ' ' | ',' => { continue }
+            ' ' | ',' => continue,
             '[' => {
                 stack.push(cur_list);
                 cur_list = List::new();
@@ -79,6 +95,9 @@ fn run() {
         //println!("Added {:?}, cur_list = {:?}, stack = {:?}", ch, cur_list, stack);
     }
     println!("cur_list: {:?}", cur_list);
+
+    let flattened = cur_list.flatmap();
+    println!("flattened: {:?}", flattened);
 }
 
 #[cfg(test)]

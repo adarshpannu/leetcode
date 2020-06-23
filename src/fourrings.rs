@@ -1,12 +1,7 @@
+// Ref: http://rosettacode.org/wiki/4-rings_or_4-squares_puzzle
+
 const LOW: i32 = 1;
 const HIGH: i32 = 7;
-
-// Replace       a, b, c, d, e, f,   and   g       with the decimal digits   LOW   ───►   HIGH
-// such that the sum of the letters inside of each of the four large squares add up to the same sum.
-
-/*
-a+b == b+c+d == d+e+f == f+g
-*/
 
 pub fn run() {
     let mut count_searched = 0u32;
