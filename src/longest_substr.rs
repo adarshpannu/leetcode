@@ -7,7 +7,9 @@ Given a string, find the length of the longest substring without repeating chara
 */
 
 fn is_next_char_repeated(s: &str, ix: usize) -> bool {
-    // Name says it all. The only catch is that the last character returns 'true.' That's a bit odd.
+    // Name says it all. The only catch is that the last character returns 'true.' That's a kludge
+    // to make the calling mark the end of an interval at the end of the string. Something that
+    // can be cleaned up.
     if ix >= s.len() - 1 {
         return true
     } else {
