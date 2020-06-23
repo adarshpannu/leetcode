@@ -6,7 +6,8 @@
 Given a string, find the length of the longest substring without repeating characters.
 */
 
-fn is_end_of_substring(s: &str, ix: usize) -> bool {
+fn is_next_char_repeated(s: &str, ix: usize) -> bool {
+    // Name says it all. The only catch is that the last character returns 'true.' That's a bit odd.
     if ix >= s.len() - 1 {
         return true
     } else {
@@ -16,25 +17,36 @@ fn is_end_of_substring(s: &str, ix: usize) -> bool {
 
 #[test]
 fn run() {
-    let s = "helllabcdddeeerer";
-    println!("is_repeated: {}", is_end_of_substring(s, 11));
+    let s = "helllabcdddeeererer";
     let mut ix = 0;
     let mut cur_interval = [0, 0];
     let mut max_interval = [0, 0];
     let mut in_interval = true;
 
     while ix < s.len() {
-        if in_interval && is_end_of_substring(s, ix) {
+        if in_interval && is_next_char_repeated(s, ix) {
             // end of interval
-            cur_interval[1] = ix;
+            cur_interval[1] = ix + 1;
             in_interval = false;
-            println!("{:?} {:?}", cur_interval, &s[cur_interval[0]..cur_interval[1]+1]);
+            println!("{:?} {:?}", cur_interval, &s[cur_interval[0]..cur_interval[1]]);
 
-        } else if ! in_interval && ! is_end_of_substring(s, ix) {
+            if (cur_interval[1] - cur_interval[0]) > (max_interval[1] - max_interval[0]) {
+                max_interval = cur_interval;
+            }
+        } else if ! in_interval && ! is_next_char_repeated(s, ix) {
             // start of new interval
             cur_interval[0] = ix;
             in_interval = true;
         }
         ix += 1;
     }
+
+    println!("Longest substring: {:?}", &s[max_interval[0]..max_interval[1]]);
+
 }
+#[test]
+fn run2() {
+    let s = "x";
+    println!("Longest substring: {:?}", &s[0..0]);
+}
+
