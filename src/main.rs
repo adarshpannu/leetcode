@@ -1,6 +1,6 @@
 #[allow(warnings)]
 
-mod atoi;
+mod atoi2;
 
 fn main() {
 }

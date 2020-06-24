@@ -1,6 +1,18 @@
-#[allow(warnings)]
+//#[allow(warnings)]
 
 // https://leetcode.com/problems/valid-number/
+
+struct Solution {}
+
+impl Solution {
+    pub fn is_number(s: String) -> bool {
+        let mut parser = NumberParser::new(s.trim().to_string());
+        match parser.parse() {
+            Err(_) => false,
+            Ok(_) => true,
+        }
+    }
+}
 
 pub struct NumberParser {
     chars: Vec<char>,
@@ -62,7 +74,7 @@ impl NumberParser {
     fn next_token(&mut self) -> Token {
         while let Some(ch) = self.next() {
             match ch {
-                ' ' => continue,
+                //' ' => continue,
                 '+' => return Token::Sign(1),
                 '-' => return Token::Sign(-1),
                 '.' => return Token::Dot,
@@ -133,13 +145,17 @@ impl NumberParser {
         };
 
         // Parse mandatory base number
-        token = np.next_token();
-        match token {
-            Token::Number(base) => { retval = base as f64 }
-            _ => return Err(format!("Unexpected character {:?}", token).to_string()),
-        }
+        token = np.peek_token();
+        let base = match token {
+            Token::Number(base) => {
+                np.next_token();
+                true
+            },
+            _ => false
+        };
 
         // Parse optional dot + fractional part
+        let mut fraction: bool = false;
         token = np.peek_token();
         if token == Token::Dot {
             np.next_token();
@@ -147,16 +163,23 @@ impl NumberParser {
             // Parse optional fractional part
             token = np.peek_token();
             match token {
-                Token::Number(fraction) => {
+                Token::Number(_) => {
+                    fraction = true;
                     np.next_token(); // consume token that we just peeked
                 }
                 _ => {}
             }
         }
 
+        if !base && !fraction {
+            return Err(format!("Unexpected token {:?}", token).to_string());
+        }
+
         // Parse optional exponent
-        token = np.next_token();
+        token = np.peek_token();
         if (token == Token::E) {
+            np.next_token(); // consume token that we just peeked
+
             // Parse optional plus/minus sign
             token = np.peek_token();
             if let Token::Sign(sign) = token {
@@ -168,6 +191,10 @@ impl NumberParser {
                 Token::Number(base) => {}
                 _ => return Err(format!("Unexpected character {:?}", token).to_string()),
             }
+        }
+        token = np.peek_token();
+        if !token.is_eof() {
+            return Err(format!("Unexpected character {:?}", token).to_string());
         }
         Ok(())
     }
@@ -192,10 +219,15 @@ fn run() {
         "95a54e53",
     ];
 
-    //let numbers = ["0.1"];
+    let numbers = ["5. 6"];
 
     for numstr in numbers.iter() {
-        let mut np = NumberParser::new(numstr.to_string());
-        println!("Parse numstr = {}, result = {:?}", numstr, np.parse());
+        //let mut np = Solution::new(numstr.to_string());
+        //println!("Parse numstr = {}, result = {:?}", numstr, np.parse());
+        println!(
+            "Parse numstr = {}, result = {:?}",
+            numstr,
+            Solution::is_number(numstr.to_string())
+        );
     }
 }
