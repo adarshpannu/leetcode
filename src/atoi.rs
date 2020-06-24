@@ -7,14 +7,23 @@ pub struct NumberParser {
     next_idx: usize, // next character to read
 }
 
+#[derive(Debug, PartialEq)]
 enum Token {
-    Plus,
-    Minus,
+    Sign(i8),
     Dot,
     E,
-    Number(i64),
-    Unknown,
-    EOF
+    Number(u64),
+    Unknown(char),
+    EOF,
+}
+
+impl Token {
+    fn is_eof(&self) -> bool {
+        match *self {
+            Token::EOF => true,
+            _ => false,
+        }
+    }
 }
 
 // [-/+] [0-9]* [[.] [0-9]*] [ e [+/-] [0-9]* ]
@@ -29,7 +38,7 @@ impl NumberParser {
         if self.next_idx < self.chars.len() {
             let ch = self.chars[self.next_idx];
             self.next_idx += 1;
-            println!("next() -> {}", ch);
+            //println!("next() -> {}", ch);
             Some(ch)
         } else {
             None
@@ -40,72 +49,68 @@ impl NumberParser {
         assert!(self.next_idx > 0);
         self.next_idx -= 1;
         let ch = self.chars[self.next_idx];
-        println!("undo() -> {}", ch);
+        //println!("undo() -> {}", ch);
+    }
+
+    fn peek_token(&mut self) -> Token {
+        let mut save_next_idx = self.next_idx;
+        let token = self.next_token();
+        self.next_idx = save_next_idx;
+        token
     }
 
     fn next_token(&mut self) -> Token {
-        let mut ch;
-
-        loop {
-            ch = self.next();
-            if ch == None {
-                break;
-            }
-            match ch.unwrap() {
-                ' ' => { continue },
+        while let Some(ch) = self.next() {
+            match ch {
+                ' ' => continue,
+                '+' => return Token::Sign(1),
+                '-' => return Token::Sign(-1),
+                '.' => return Token::Dot,
+                'e' => return Token::E,
                 '0' | '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9' => {
-
+                    self.undo_next();
+                    let num = self.parse_natural_number().unwrap();
+                    return Token::Number(num);
                 }
-                _ => return Token::Unknown
+                _ => return Token::Unknown(ch),
             }
         }
         Token::EOF
-    }
-
-    fn parse_white_space(&mut self) {
-        while (self.next() == Some(' ')) {}
-        self.undo_next();
-    }
-
-    fn parse_plus_or_minus(&mut self) -> Option<char> {
-        let ch = self.next();
-        match ch {
-            Some('+') | Some('-') => {
-                self.undo_next();
-                ch
-            }
-            _ => None,
-        }
     }
 
     fn to_digit(ch: Option<char>) -> Option<u64> {
         match ch {
             Some(digit) => {
                 if (digit >= '0') && (digit <= '9') {
-                    Some((digit as u64) -  ('0' as u64))
+                    Some((digit as u64) - ('0' as u64))
                 } else {
                     None
                 }
             }
-            _ => None
+            _ => None,
         }
     }
 
     fn parse_natural_number(&mut self) -> Option<u64> {
         let mut number = vec![];
         let mut ch = self.next();
+
         while let Some(digit) = Self::to_digit(ch) {
             number.push(digit);
             ch = self.next();
+            if ch == None {
+                break;
+            }
         }
-        self.undo_next();
+
+        if ch != None {
+            self.undo_next();
+        }
+
         if number.len() > 0 {
             let mut retval = 0u64;
-            let mut multiplier = 1;
-            number.reverse();
-            for digit in number.iter() {
-                retval += (*digit * multiplier);
-                multiplier *= 10;
+            for &digit in number.iter() {
+                retval = (digit + retval * 10);
             }
             Some(retval)
         } else {
@@ -113,16 +118,84 @@ impl NumberParser {
         }
     }
 
-    pub fn is_number() -> bool {
-        false
+    fn parse(&mut self) -> Result<(), String> {
+        let mut token;
+        let np = self;
+        let retval: f64;
+
+        // Parse optional leading sign +/-
+        token = np.peek_token();
+        let sign = if let Token::Sign(sign) = token {
+            np.next_token();
+            sign
+        } else {
+            1
+        };
+
+        // Parse mandatory base number
+        token = np.next_token();
+        match token {
+            Token::Number(base) => { retval = base as f64 }
+            _ => return Err(format!("Unexpected character {:?}", token).to_string()),
+        }
+
+        // Parse optional dot + fractional part
+        token = np.peek_token();
+        if token == Token::Dot {
+            np.next_token();
+
+            // Parse optional fractional part
+            token = np.peek_token();
+            match token {
+                Token::Number(fraction) => {
+                    np.next_token(); // consume token that we just peeked
+                }
+                _ => {}
+            }
+        }
+
+        // Parse optional exponent
+        token = np.next_token();
+        if (token == Token::E) {
+            // Parse optional plus/minus sign
+            token = np.peek_token();
+            if let Token::Sign(sign) = token {
+                np.next_token(); // consume token that we just peeked
+            }
+            // Parse mandatory base number
+            token = np.next_token();
+            match token {
+                Token::Number(base) => {}
+                _ => return Err(format!("Unexpected character {:?}", token).to_string()),
+            }
+        }
+        Ok(())
     }
 }
 
 #[test]
 fn run() {
-    let mut np = NumberParser::new(" 123.".to_string());
+    let numbers = [
+        "0",
+        " 0.1 ",
+        "abc",
+        "1 a",
+        "2e10",
+        " -90e3   ",
+        " 1e",
+        "e3",
+        " 6e-1",
+        " 99e2.5 ",
+        "53.5e93",
+        " --6 ",
+        "-+3",
+        "95a54e53",
+    ];
 
-    println!("{:?}", np.parse_white_space());
-    println!("{:?}", np.parse_natural_number());
+    //let numbers = ["0.1"];
 
+    for numstr in numbers.iter() {
+        let mut np = NumberParser::new(numstr.to_string());
+        println!("Parse numstr = {}, result = {:?}", numstr, np.parse());
+    }
 }
