@@ -1,6 +1,6 @@
 #[allow(warnings)]
 
-mod longest_substr;
+mod atoi;
 
 fn main() {
 }
