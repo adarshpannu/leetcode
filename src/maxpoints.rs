@@ -6,7 +6,7 @@ use std::fmt;
 use std::ops::Add;
 use std::ops::Mul;
 
-fn gcd(a: i32, b: i32) -> i32 {
+fn gcd(a: i128, b: i128) -> i128 {
     let mut remainder = 0;
     let (mut a, mut b) = (a, b);
 
@@ -25,23 +25,18 @@ fn gcd(a: i32, b: i32) -> i32 {
     a
 }
 
-fn lcm(a: i32, b: i32) -> i32 {
+fn lcm(a: i128, b: i128) -> i128 {
     if (a == 0) || (b == 0) {
         0
     } else {
-        (a * b) / gcd(a, b)
+        ((a * b) / gcd(a, b))
     }
-}
-
-struct Point {
-    x: i32,
-    y: i32,
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 struct Fraction {
-    num: i32,
-    den: i32,
+    num: i128,
+    den: i128,
 }
 
 fn ifelse<T: Copy>(cond: bool, thenval: T, elseval: T) -> T {
@@ -53,7 +48,10 @@ fn ifelse<T: Copy>(cond: bool, thenval: T, elseval: T) -> T {
 }
 
 impl Fraction {
-    fn new(num: i32, den: i32) -> Fraction {
+    fn new(num: i128, den: i128) -> Fraction {
+        let num = num as i128;
+        let den = den as i128;
+
         assert!(den != 0);
         let sign = ifelse((num < 0) ^ (den < 0), -1, 1);
         let (num, den) = (num.abs(), den.abs());
@@ -98,7 +96,7 @@ impl Mul for Fraction {
 struct Line {
     m: Option<Fraction>, // slope.
     b: Option<Fraction>, // y-offset.
-    a: Option<i32>, // x-offset: for vertical lines, `m` == `b` == None and `a` denotes the x-offset
+    a: Option<i128>, // x-offset: for vertical lines, `m` == `b` == None and `a` denotes the x-offset
 }
 
 impl fmt::Display for Line {
@@ -113,7 +111,10 @@ impl fmt::Display for Line {
 }
 
 impl Line {
-    fn new(x1: i32, y1: i32, x2: i32, y2: i32) -> Line {
+    fn new(p1: &Vec<i32>, p2: &Vec<i32>) -> Line {
+
+        //println!("{:?} {:?}", p1, p2);
+        let (x1, y1, x2, y2) = (p1[0] as i128, p1[1] as i128, p2[0] as i128, p2[1] as i128);
         let m = if (x1 == x2) { None } else { Some(Fraction::new(y2 - y1, x2 - x1)) };
         let b = if (x1 == x2) {
             None
@@ -126,12 +127,8 @@ impl Line {
         Line { m, b, a }
     }
 
-    fn new_from_pairs(p1: &Vec<i32>, p2: &Vec<i32>) -> Line {
-        Line::new(p1[0], p1[1], p2[0], p2[1])
-    }
-
     fn has_point(&self, p: &Vec<i32>) -> bool {
-        let (x, y) = (p[0], p[1]);
+        let (x, y) = (p[0] as i128, p[1] as i128);
         if let Some(a) = self.a {
             // Vertical line
             x == a
@@ -140,68 +137,46 @@ impl Line {
             y0 == Fraction::new(y, 1)
         }
     }
-
-    pub fn on_a_line(p1: &Vec<i32>, p2: &Vec<i32>, p3: &Vec<i32>) -> Option<Line> {
-        let line12 = Line::new_from_pairs(p1, p2);
-        let line23 = Line::new_from_pairs(p2, p3);
-        let line13 = Line::new_from_pairs(p1, p3);
-
-        if (*p1 == *p2) && (*p2 == *p3) {
-            panic!("All three points are identical? {:?} {:?} {:?}", *p1, *p2, *p3);
-        }
-
-        if *p1 == *p2 {
-            Some(line13)
-        } else if *p2 == *p3 {
-            Some(line13)
-        } else if *p1 == *p3 {
-            Some(line12)
-        } else if line12 == line23 {
-            Some(line12)
-        } else {
-            None
-        }
-    }
 }
 
 impl Solution {
     pub fn max_points(points: Vec<Vec<i32>>) -> i32 {
         let mut lines = HashMap::new();
 
+        // Determine all lines on the plane
         for (i, p1) in points.iter().enumerate() {
             for (j, p2) in points.iter().enumerate() {
-                if j <= i {
+                if (j <= i) {
                     continue;
                 }
-                for (k, p3) in points.iter().enumerate() {
-                    if k <= j {
-                        continue;
-                    }
+                let line = Line::new(&p1, &p2);
+                lines.insert(line, 0);
+                //println!("Inserted line: {}  using {:?} - {:?}", line, p1, p2);
+            }
+        }
 
-                    if let Some(line) = Line::on_a_line(p1, p2, p3) {
-                        let a = Line::on_a_line(p1, p2, p3);
-                        
-                        println!(
-                            "EQ: p1 = {:?}, p2 = {:?}, p3 = {:?}, line = {}",
-                            p1, p2, p3, line
-                        );
+        // Count # of points on each line
+        let mut max_count = 0;
+        let mut count = 0;
 
-                        // Insert new entry (if needed) and increment count
-                        let count = lines.entry(line).or_insert(0);
-                        *count += 1;
-                    }
+        for (line, _) in &lines {
+            count = 0;
+            for p in points.iter() {
+                if line.has_point(p) {
+                    count += 1;
+                    //println!("> p1 = {:?} lines on line = {}", p, line);
                 }
+            }
+            if count > max_count {
+                max_count = count;
             }
         }
 
         if points.len() <= 1 {
             // No lines with 2+ points
             points.len() as i32
-        } else if lines.len() == 0 {
-            2
         } else {
-            let v = lines.values().into_iter().max().unwrap();
-            find_n_for_nc3(*v)
+            max_count
         }
     }
 }
@@ -209,35 +184,23 @@ impl Solution {
 #[test]
 fn test() {
     let points = vec![[1, 1], [3, 2], [5, 3], [4, 1], [2, 3], [1, 4]];
-    //let points = vec![[1, 1], [2, 2], [3, 3], [4, 4]];
     //let points = vec![[4, 0], [4, 1], [4, -1], [4, 8]];
     let points = vec![[1, 1], [3, 2], [5, 3], [4, 1], [2, 3], [1, 4]];
-    let points = vec![[-435,-347],[-435,-347],[609,613],[-348,-267],[-174,-107],[87,133],[-87,-27],[-609,-507],[435,453],[-870,-747],[-783,-667],[0,53],[-174,-107],[783,773],[-261,-187],[-609,-507],[-261,-187],[-87,-27],[87,133],[783,773],[-783,-667],[-609,-507],[-435,-347],[783,773],[-870,-747],[87,133],[87,133],[870,853],[696,693],[0,53],[174,213],[-783,-667],[-609,-507],[261,293],[435,453],[261,293],[435,453]];
+    let points = vec![[0,0],[1,65536],[65536,0]];
 
     let points: Vec<Vec<i32>> = points.iter().map(|point| vec![point[0], point[1]]).collect();
 
+    println!("\n");
     dbg!(Solution::max_points(points));
-}
-
-fn find_n_for_nc3(nc3: i32) -> i32 {
-    let mut calnc3 = 1;
-    let mut n = 3;
-
-    loop {
-        if (nc3 == calnc3) {
-            return n;
-        }
-        if (n == 100) {
-            panic!("Runaway loop? nc3 = {}", nc3);
-        }
-        n = n + 1;
-        calnc3 = n * calnc3 / (n - 3);
-    }
-}
-
-#[test]
-fn test_nc3() {
-    dbg!(find_n_for_nc3(26235));
+    println!("\n");
 }
 
 struct Solution {}
+
+#[test]
+fn test2() {
+    let a = 65538i128;
+
+    println!("{}", a * a * a);
+
+}
