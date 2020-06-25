@@ -1,6 +1,6 @@
 #[allow(warnings)]
 
-mod atoi2;
+mod maxpoints;
 
 fn main() {
 }
