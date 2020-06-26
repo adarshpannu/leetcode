@@ -6,7 +6,7 @@ use std::fmt;
 use std::ops::Add;
 use std::ops::Mul;
 
-fn gcd(a: i128, b: i128) -> i128 {
+fn gcd(a: i64, b: i64) -> i64 {
     let mut remainder = 0;
     let (mut a, mut b) = (a, b);
 
@@ -25,7 +25,7 @@ fn gcd(a: i128, b: i128) -> i128 {
     a
 }
 
-fn lcm(a: i128, b: i128) -> i128 {
+fn lcm(a: i64, b: i64) -> i64 {
     if (a == 0) || (b == 0) {
         0
     } else {
@@ -35,8 +35,8 @@ fn lcm(a: i128, b: i128) -> i128 {
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, Hash)]
 struct Fraction {
-    num: i128,
-    den: i128,
+    num: i64,
+    den: i64,
 }
 
 fn ifelse<T: Copy>(cond: bool, thenval: T, elseval: T) -> T {
@@ -48,9 +48,9 @@ fn ifelse<T: Copy>(cond: bool, thenval: T, elseval: T) -> T {
 }
 
 impl Fraction {
-    fn new(num: i128, den: i128) -> Fraction {
-        let num = num as i128;
-        let den = den as i128;
+    fn new(num: i64, den: i64) -> Fraction {
+        let num = num as i64;
+        let den = den as i64;
 
         assert!(den != 0);
         let sign = ifelse((num < 0) ^ (den < 0), -1, 1);
@@ -96,7 +96,7 @@ impl Mul for Fraction {
 struct Line {
     m: Option<Fraction>, // slope.
     b: Option<Fraction>, // y-offset.
-    a: Option<i128>, // x-offset: for vertical lines, `m` == `b` == None and `a` denotes the x-offset
+    a: Option<i64>, // x-offset: for vertical lines, `m` == `b` == None and `a` denotes the x-offset
 }
 
 impl fmt::Display for Line {
@@ -114,7 +114,7 @@ impl Line {
     fn new(p1: &Vec<i32>, p2: &Vec<i32>) -> Line {
 
         //println!("{:?} {:?}", p1, p2);
-        let (x1, y1, x2, y2) = (p1[0] as i128, p1[1] as i128, p2[0] as i128, p2[1] as i128);
+        let (x1, y1, x2, y2) = (p1[0] as i64, p1[1] as i64, p2[0] as i64, p2[1] as i64);
         let m = if (x1 == x2) { None } else { Some(Fraction::new(y2 - y1, x2 - x1)) };
         let b = if (x1 == x2) {
             None
@@ -198,7 +198,6 @@ fn test() {
     dbg!(Solution::max_points(points));
     println!("\n");
 }
-
 
 struct Solution {}
 
