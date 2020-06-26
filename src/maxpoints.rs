@@ -1,7 +1,7 @@
 // Ref: https://leetcode.com/problems/max-points-on-a-line/
 
 use std::cmp::Eq;
-use std::collections::HashMap;
+use std::collections::{HashMap, HashSet};
 use std::fmt;
 use std::ops::Add;
 use std::ops::Mul;
@@ -126,16 +126,29 @@ impl Line {
         let a = if (x1 == x2) { Some(x1) } else { None };
         Line { m, b, a }
     }
+}
 
-    fn has_point(&self, p: &Vec<i32>) -> bool {
-        let (x, y) = (p[0] as i128, p[1] as i128);
-        if let Some(a) = self.a {
-            // Vertical line
-            x == a
+#[derive(Debug, Copy, Clone, PartialEq)]
+struct Line2 {
+    m: f64,
+    b: f64,
+    a: f64
+}
+
+impl Line2 {
+    fn new(p1: &Vec<i32>, p2: &Vec<i32>) -> Line2 {
+        //println!("{:?} {:?}", p1, p2);
+        let (x1, y1, x2, y2) = (p1[0] as f64, p1[1] as f64, p2[0] as f64, p2[1] as f64);
+        let m = if (x1 == x2) { 0.0 } else { (y2 - y1) / (x2 - x1) };
+        let b = if (x1 == x2) {
+            0.0
         } else {
-            let y0 = self.m.unwrap() * Fraction::new(x, 1) + self.b.unwrap();
-            y0 == Fraction::new(y, 1)
-        }
+            let b_num = ((x2 - x1) * y1) - ((y2 - y1) * x1);
+            let b_den = x2 - x1;
+            b_num / b_den
+        };
+        let a = if (x1 == x2) { x1 } else { 0.0 };
+        Line2 { m, b, a }
     }
 }
 
@@ -149,34 +162,18 @@ impl Solution {
                 if (j <= i) {
                     continue;
                 }
-                let line = Line::new(&p1, &p2);
-                lines.insert(line, 0);
-                //println!("Inserted line: {}  using {:?} - {:?}", line, p1, p2);
-            }
-        }
-
-        // Count # of points on each line
-        let mut max_count = 0;
-        let mut count = 0;
-
-        for (line, _) in &lines {
-            count = 0;
-            for p in points.iter() {
-                if line.has_point(p) {
-                    count += 1;
-                    //println!("> p1 = {:?} lines on line = {}", p, line);
-                }
-            }
-            if count > max_count {
-                max_count = count;
+                let line = Line::new(p1, p2);
+                let set = lines.entry(line).or_insert(HashSet::new());
+                set.insert(i);
+                set.insert(j);
             }
         }
 
         if points.len() <= 1 {
-            // No lines with 2+ points
             points.len() as i32
         } else {
-            max_count
+            let retval = lines.iter().map(|(_,set)| set.len()).max();
+            retval.unwrap() as i32
         }
     }
 }
@@ -186,7 +183,8 @@ fn test() {
     let points = vec![[1, 1], [3, 2], [5, 3], [4, 1], [2, 3], [1, 4]];
     //let points = vec![[4, 0], [4, 1], [4, -1], [4, 8]];
     let points = vec![[1, 1], [3, 2], [5, 3], [4, 1], [2, 3], [1, 4]];
-    let points = vec![[0,0],[1,65536],[65536,0]];
+    let points = vec![[0,0],[1,65536],[65536,0], [0,0]];
+    //let points = vec![[0,0],[1,0],[1,0],[2,0]];
 
     let points: Vec<Vec<i32>> = points.iter().map(|point| vec![point[0], point[1]]).collect();
 
@@ -197,10 +195,3 @@ fn test() {
 
 struct Solution {}
 
-#[test]
-fn test2() {
-    let a = 65538i128;
-
-    println!("{}", a * a * a);
-
-}
