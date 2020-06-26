@@ -128,63 +128,69 @@ impl Line {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
-struct Line2 {
-    m: f64,
-    b: f64,
-    a: f64
+fn find_n_for_nc2(nc2: i32) -> i32 {
+    let mut n = 2;
+    let mut calnc2 = 1;
+    
+    loop {
+        if (nc2 == calnc2) {
+            return n;
+        }
+        if (n == 100) {
+            panic!("Runaway loop? nc3 = {}", nc2);
+        }
+        n = n + 1;
+        calnc2 = n * calnc2 / (n - 2);
+    }
 }
 
-impl Line2 {
-    fn new(p1: &Vec<i32>, p2: &Vec<i32>) -> Line2 {
-        //println!("{:?} {:?}", p1, p2);
-        let (x1, y1, x2, y2) = (p1[0] as f64, p1[1] as f64, p2[0] as f64, p2[1] as f64);
-        let m = if (x1 == x2) { 0.0 } else { (y2 - y1) / (x2 - x1) };
-        let b = if (x1 == x2) {
-            0.0
-        } else {
-            let b_num = ((x2 - x1) * y1) - ((y2 - y1) * x1);
-            let b_den = x2 - x1;
-            b_num / b_den
-        };
-        let a = if (x1 == x2) { x1 } else { 0.0 };
-        Line2 { m, b, a }
-    }
+#[test]
+fn test_nc2() {
+    dbg!(find_n_for_nc2(1));
 }
 
 impl Solution {
     pub fn max_points(points: Vec<Vec<i32>>) -> i32 {
+
+        let mut points_grouped = HashMap::new();
+        for p in &points {
+            let mut count = points_grouped.entry(p).or_insert(0);
+            *count += 1;
+        }
+
+        //println!("points_grouped = {:?}", points_grouped);
+
         let mut lines = HashMap::new();
 
         // Determine all lines on the plane
-        for (i, p1) in points.iter().enumerate() {
-            for (j, p2) in points.iter().enumerate() {
+        for (i, (&p1, icount)) in points_grouped.iter().enumerate() {
+            for (j, (&p2, jcount)) in points_grouped.iter().enumerate() {
                 if (j <= i) {
                     continue;
                 }
                 let line = Line::new(p1, p2);
-                let set = lines.entry(line).or_insert(HashSet::new());
-                set.insert(i);
-                set.insert(j);
+                let line_counts = (0, 0);
+                let mut count = lines.entry(line).or_insert(line_counts);
+                count.0 += 1;
+                count.1 += (icount + jcount);
             }
         }
 
-        if points.len() <= 1 {
+        //println!("lines = {:?}", lines);
+        //dbg!(points.len());
+
+        if points.len() <= 2 || lines.len() == 0 {
             points.len() as i32
         } else {
-            let retval = lines.iter().map(|(_,set)| set.len()).max();
-            retval.unwrap() as i32
+            let retval = lines.iter().map(|(_,&count)| count.1 / (find_n_for_nc2(count.0) - 1)).max().unwrap();
+            retval
         }
     }
 }
 
 #[test]
 fn test() {
-    let points = vec![[1, 1], [3, 2], [5, 3], [4, 1], [2, 3], [1, 4]];
-    //let points = vec![[4, 0], [4, 1], [4, -1], [4, 8]];
-    let points = vec![[1, 1], [3, 2], [5, 3], [4, 1], [2, 3], [1, 4]];
-    let points = vec![[0,0],[1,65536],[65536,0], [0,0]];
-    //let points = vec![[0,0],[1,0],[1,0],[2,0]];
+    let points = vec![[0,0],   [1,0],[1,0],  [2,0],   [4,0],   [8,0]];
 
     let points: Vec<Vec<i32>> = points.iter().map(|point| vec![point[0], point[1]]).collect();
 
@@ -192,6 +198,7 @@ fn test() {
     dbg!(Solution::max_points(points));
     println!("\n");
 }
+
 
 struct Solution {}
 
