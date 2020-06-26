@@ -1,6 +1,7 @@
 #[allow(warnings)]
 
-mod maxpoints;
+mod reverseint;
 
 fn main() {
+    println!("Hello, world");
 }
