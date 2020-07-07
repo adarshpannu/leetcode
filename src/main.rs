@@ -1,5 +1,6 @@
 #[allow(warnings)]
-mod lc1470_shuffle_array;
+
+mod lc965_univalued_tree;
 
 fn main() {
     println!("Hello, world");

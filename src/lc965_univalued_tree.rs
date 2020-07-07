@@ -1,4 +1,7 @@
+// Ref: https://leetcode.com/problems/univalued-binary-tree/
+
 // Definition for a binary tree node.
+
 #[derive(Debug, PartialEq, Eq)]
 pub struct TreeNode {
     pub val: i32,
@@ -17,34 +20,22 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 impl Solution {
-    /*
     pub fn is_unival_tree(root: Option<Rc<RefCell<TreeNode>>>) -> bool {
-        if let Some(rc) = root {
-            let tn = rc.borrow();
-            let value = tn.val;
-            let mut queue = vec![tn];
+        Self::check_tree(root.as_ref(), root.as_ref().map_or_else(|| -1, |node| node.borrow().val))
+    }
 
-            loop {
-                if let Some(node) = queue.pop() {
-                    if node.val != value {
-                        return false;
-                    }
-                    if let Some(ref rc_left) = node.left {
-                        let refcell = &**rc_left;
-                        let node = refcell.borrow();
-                        queue.push(node);
-                    }
-                } else {
-                    break;
-                }
+    pub fn check_tree(root: Option<&Rc<RefCell<TreeNode>>>, val: i32) -> bool {
+        if let Some(node) = root {
+            if (node.borrow().val != val)
+                || (Self::check_tree(node.borrow().left.as_ref(), val) == false)
+                || (Self::check_tree(node.borrow().right.as_ref(), val) == false)
+            {
+                return false;
             }
         }
-        true
+        return true;
     }
-    */
 }
-
-struct Solution;
 
 #[test]
 fn test() {
@@ -55,14 +46,9 @@ fn test() {
     parent.left = Some(Rc::new(RefCell::new(left)));
     parent.right = Some(Rc::new(RefCell::new(right)));
 
-    //assert_eq!(Solution::is_unival_tree(Some(Rc::new(RefCell::new(parent)))), false);
+    let parent = Some(Rc::new(RefCell::new(parent)));
 
-    let tn = Some(Rc::new(RefCell::new(parent)));
-    if let Some(node_opt) = tn {
-        let node = &*node_opt.borrow();
-        //let left = node.left.as_ref().unwrap();
-
-    }
-    dbg!(tn);
-
+    assert_eq!(Solution::is_unival_tree(parent), false);
 }
+
+struct Solution;
