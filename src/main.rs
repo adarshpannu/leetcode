@@ -1,6 +1,6 @@
 #[allow(warnings)]
 
-mod lc965_univalued_tree;
+mod lc655_print_tree;
 
 fn main() {
     println!("Hello, world");
