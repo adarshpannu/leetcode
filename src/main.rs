@@ -6,6 +6,7 @@
 mod lc10_regexp;
 
 fn main() {
-    println!("Hello, world");
+    println!("Hello, world!");
 }
+
 
