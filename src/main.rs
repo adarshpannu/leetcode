@@ -1,6 +1,6 @@
 #[allow(warnings)]
 
-mod lc1684_consistent_strings;
+mod lc1365_smaller_number;
 
 fn main() {
     println!("Hello, world!");
