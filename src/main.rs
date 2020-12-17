@@ -1,6 +1,6 @@
 #[allow(warnings)]
 
-mod lc1365_smaller_number;
+mod lc763_partition_labels;
 
 fn main() {
     println!("Hello, world!");
