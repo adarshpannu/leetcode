@@ -1,6 +1,6 @@
 #[allow(warnings)]
 
-mod lc763_partition_labels;
+mod lc10_regex;
 
 fn main() {
     println!("Hello, world!");
