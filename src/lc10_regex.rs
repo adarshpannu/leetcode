@@ -1,8 +1,8 @@
 struct Solution;
 
 /*
-Given an input string (s) and a pattern (p), implement regular expression 
-matching with support for '.' and '*' where: 
+Given an input string (s) and a pattern (p), implement regular expression
+matching with support for '.' and '*' where:
 
 '.' Matches any single character.​​​​
 '*' Matches zero or more of the preceding element.
@@ -17,6 +17,8 @@ Output: false
 
 impl Solution {
     pub fn is_match(s: String, p: String) -> bool {
+        for ch in s.chars() {
+        }
         false
     }
 }
