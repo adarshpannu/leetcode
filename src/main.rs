@@ -1,6 +1,6 @@
 #[allow(warnings)]
 
-mod lc10_regex;
+mod lc993_cousins_binary_tree;
 
 fn main() {
     println!("Hello, world!");
