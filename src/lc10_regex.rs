@@ -15,6 +15,13 @@ Output: false
 
 */
 
+enum RegexElem {
+    Dot,
+    Star(char),
+    Specific(char)
+}
+
+
 impl Solution {
     pub fn is_match(s: String, p: String) -> bool {
         for ch in s.chars() {
