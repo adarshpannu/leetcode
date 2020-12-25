@@ -1,6 +1,6 @@
 #[allow(warnings)]
 
-mod lc993_cousins_binary_tree;
+mod lc1005_maximize_sum;
 
 fn main() {
     println!("Hello, world!");
