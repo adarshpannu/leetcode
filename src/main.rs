@@ -1,6 +1,6 @@
 #[allow(warnings)]
 
-mod lc404_sum_of_left_leaves;
+mod lc953_alien_dict;
 
 fn main() {
     println!("Hello, world!");
