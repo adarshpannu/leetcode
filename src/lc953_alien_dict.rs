@@ -4,23 +4,23 @@ use std::collections::HashMap;
 impl Solution {
     pub fn is_alien_sorted(words: Vec<String>, order: String) -> bool {
         // remap to english alphabet
-        let remapped_alphabet: HashMap<char, char> = order
+        let remapped_alphabet: HashMap<char, usize> = order
             .chars()
             .enumerate()
-            .map(|(ix, ch)| (ch, ('a' as u8 + ix as u8) as char))
+            .map(|(ix, ch)| (ch, ix))
             .collect();
 
-        let mut prev_remapped_word: String = "".to_string();
-        for (ix, word) in words.iter().enumerate() {
-            // remap word
-            let remapped_word: String = word
-                .chars()
-                .map(|ch| remapped_alphabet[&ch])
-                .collect();
-            if ix > 0 && prev_remapped_word > remapped_word {
-                return false;
+        'toploop: for word_pair in words.windows(2) {
+            for (ch1, ch2) in word_pair[0].chars().zip(word_pair[1].chars()) {
+                match remapped_alphabet[&ch1].cmp(&remapped_alphabet[&ch2]) {
+                    std::cmp::Ordering::Equal => {},
+                    std::cmp::Ordering::Greater => return false,
+                    std::cmp::Ordering::Less => continue 'toploop,
+                }
             }
-            prev_remapped_word = remapped_word;
+            if word_pair[0].len() > word_pair[1].len() {
+                return false
+            }
         }
         return true;
     }
@@ -32,7 +32,7 @@ fn test() {
 
     assert_eq!(
         Solution::is_alien_sorted(
-            vec!["hello".to_string(), "leetcode".to_string()],
+            vec!["hellow".to_string(), "hello".to_string()],
             "hlabcdefgijkmnopqrstuvwxyz".to_string(),
         ),
         true
