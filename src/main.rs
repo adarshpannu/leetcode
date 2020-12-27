@@ -1,6 +1,6 @@
 #[allow(warnings)]
 
-mod lc953_alien_dict;
+mod lc564_closest_palindrome;
 
 fn main() {
     println!("Hello, world!");
