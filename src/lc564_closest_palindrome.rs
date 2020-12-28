@@ -35,8 +35,10 @@ impl Solution {
             }
             let diff = (gen as i32 - value as i32).abs() as u32;
             if i == 0 || diff < closest_diff || (diff == closest_diff && gen < closest) {
-                closest_diff = diff;
-                closest = gen;
+                if gen != value {
+                    closest_diff = diff;
+                    closest = gen;
+                }
             }
             //dbg!(gen);
         }
@@ -46,6 +48,6 @@ impl Solution {
 
 #[test]
 fn test() {
-    let n = "1".to_string();
+    let n = "43234".to_string();
     dbg!(Solution::nearest_palindromic(n));
 }
