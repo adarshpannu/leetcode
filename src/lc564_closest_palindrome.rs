@@ -7,22 +7,16 @@ impl Solution {
             .collect::<Vec<i32>>()
     }
 
+    fn to_num(v: &Vec<i32>) -> i32 {
+        v.into_iter().fold(0, |acc, e| acc * 10 + e)
+    }
+
     fn reflect(digits: &mut Vec<i32>) {
         let len = digits.len();
         let imid = len / 2;
         (0..imid).into_iter().for_each(|ix| {
             digits[len - 1 - ix] = digits[ix];
         });
-    }
-
-    fn is_palindrome(v: &Vec<i32>) -> bool {
-        (0..v.len() / 2)
-            .into_iter()
-            .all(|ix| v[ix] == v[v.len() - 1 - ix])
-    }
-
-    fn to_num(v: &Vec<i32>) -> i32 {
-        v.into_iter().fold(0, |acc, e| acc * 10 + e)
     }
 
     pub fn nearest_palindromic(n: String) -> String {
@@ -68,7 +62,7 @@ impl Solution {
 fn test() {
     use Solution;
 
-    Solution::nearest_palindromic("12345".to_string());
+    Solution::nearest_palindromic("20".to_string());
 
     /*
     assert_eq!(Solution::nearest_palindromic("1".to_string()), "0");
