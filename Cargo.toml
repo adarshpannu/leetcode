@@ -8,4 +8,5 @@ edition = "2018"
 
 [dependencies]
 fstrings = "0.2.3"
+itertools = "0.10.0"
 
