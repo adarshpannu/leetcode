@@ -5,29 +5,27 @@ fn main() {
     println!("Hello, world!");
 }
 
-fn largest<T>(lst: &[T]) -> &T
-where
-    T: PartialOrd,
-{
-    let mut largest = &lst[0];
-    for e in lst {
-        if e > largest {
-            largest = e
-        }
-    }
-    largest
+
+struct Point<T, U> {
+    x: T,
+    y: U,
 }
 
-struct S<T> {
-    e: T
+impl<T, U> Point<T, U> {
+    fn mixup<V, W>(self, other: Point<V, W>) -> Point<T, W> {
+        Point {
+            x: self.x,
+            y: other.y,
+        }
+    }
 }
 
 #[test]
 fn test() {
-    let lst = vec![10, 0, -1, 98, 11, 8];
-    dbg!(largest(&lst));
+    let p1 = Point { x: 5, y: 10.4 };
+    let p2 = Point { x: "Hello", y: 'c' };
 
-    let lst: Vec<i8> = vec![10, 0, -1, 98, 11, 8];
-    dbg!(largest(&lst));
+    let p3 = p1.mixup(p2);
 
+    println!("p3.x = {}, p3.y = {}", p3.x, p3.y);
 }
