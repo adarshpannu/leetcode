@@ -20,6 +20,7 @@ impl<T, U> Point<T, U> {
     }
 }
 
+
 #[test]
 fn test() {
     let p1 = Point { x: 5, y: 10.4 };
