@@ -1,5 +1,6 @@
 #[allow(warnings)]
 mod lc1657_close_strings;
+mod lc336_palindrome_pairs;
 
 fn main() {
     println!("Hello, world!");
