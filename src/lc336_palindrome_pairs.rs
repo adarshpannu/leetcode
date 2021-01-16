@@ -20,12 +20,15 @@ impl Solution {
         let words: Vec<Vec<char>> = words.iter().map(|e| e.chars().collect()).collect();
 
         for (ix, word1) in words.iter().enumerate() {
-            for (jx, word2) in words.iter().enumerate() {
-                if ix != jx {
-                    if Self::is_palindrome(word1, word2) {
-                        let v = vec![ix as i32, jx as i32];
-                        retval.push(v);
-                    }
+            for jx in ix + 1..words.len() {
+                let word2 = &words[jx];
+                if Self::is_palindrome(word1, word2) {
+                    let v = vec![ix as i32, jx as i32];
+                    retval.push(v);
+                }
+                if Self::is_palindrome(word2, word1) {
+                    let v = vec![jx as i32, ix as i32];
+                    retval.push(v);
                 }
             }
         }
@@ -38,6 +41,11 @@ fn test() {
     use Solution;
 
     let words = vec!["abcd", "dcba", "lls", "s", "sssll"];
+    let words = vec!["a", ""];
+
     let words = words.iter().map(|e| e.to_string()).collect();
     dbg!(Solution::palindrome_pairs(words));
+
+    let s = String::from("abc");
+    let ss = &s[0..2];
 }
