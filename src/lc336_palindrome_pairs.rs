@@ -1,3 +1,6 @@
+#![allow(warnings)]
+
+use std::cmp::Ordering;
 struct Solution;
 
 impl Solution {
@@ -17,21 +20,24 @@ impl Solution {
 
     pub fn palindrome_pairs(words: Vec<String>) -> Vec<Vec<i32>> {
         let mut retval: Vec<Vec<i32>> = Vec::new();
-        let words: Vec<Vec<char>> = words.iter().map(|e| e.chars().collect()).collect();
+        //let words: Vec<Vec<char>> = words.iter().map(|e| e.chars().collect()).collect();
 
-        for (ix, word1) in words.iter().enumerate() {
-            for jx in ix + 1..words.len() {
-                let word2 = &words[jx];
-                if Self::is_palindrome(word1, word2) {
-                    let v = vec![ix as i32, jx as i32];
-                    retval.push(v);
-                }
-                if Self::is_palindrome(word2, word1) {
-                    let v = vec![jx as i32, ix as i32];
-                    retval.push(v);
-                }
+        let mut words = words.iter().enumerate().flat_map(|(ix, w)| {
+            let mut wrev = w.clone();
+            let wrev: String = w.chars().rev().collect();
+            vec![(w.clone(), ix, "orig"), (wrev, ix, "rev")]
+        }).collect::<Vec<(String,usize,&str)>>();
+
+        words.sort_by(|a, b| {
+            let cmp = a.0.cmp(&b.0);
+            if cmp == Ordering::Equal {
+                a.2.cmp(&b.2)
+            } else {
+                cmp
             }
-        }
+        });
+
+        dbg!(words);
         retval
     }
 }
@@ -40,8 +46,8 @@ impl Solution {
 fn test() {
     use Solution;
 
-    let words = vec!["abcd", "dcba", "lls", "s", "sssll"];
-    let words = vec!["a", ""];
+    let words = vec!["abx", "ba", "lls", "s", "sssll", "dxba"];
+    //let words = vec!["a", ""];
 
     let words = words.iter().map(|e| e.to_string()).collect();
     dbg!(Solution::palindrome_pairs(words));
