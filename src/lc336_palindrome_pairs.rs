@@ -22,11 +22,19 @@ impl Solution {
         let mut retval: Vec<Vec<i32>> = Vec::new();
         //let words: Vec<Vec<char>> = words.iter().map(|e| e.chars().collect()).collect();
 
-        let mut words = words.iter().enumerate().flat_map(|(ix, w)| {
-            let mut wrev = w.clone();
-            let wrev: String = w.chars().rev().collect();
-            vec![(w.clone(), ix, "orig"), (wrev, ix, "rev")]
-        }).collect::<Vec<(String,usize,&str)>>();
+        let mut words = words
+            .iter()
+            .enumerate()
+            .flat_map(|(ix, w)| {
+                if w.len() > 0 {
+                    let mut wrev = w.clone();
+                    let wrev: String = w.chars().rev().collect();
+                    vec![(w.clone(), ix, "orig"), (wrev, ix, "rev")]
+                } else {
+                    vec![(w.clone(), ix, "orig")]
+                }
+            })
+            .collect::<Vec<(String, usize, &str)>>();
 
         words.sort_by(|a, b| {
             let cmp = a.0.cmp(&b.0);
@@ -46,7 +54,7 @@ impl Solution {
 fn test() {
     use Solution;
 
-    let words = vec!["abx", "ba", "lls", "s", "sssll", "dxba"];
+    let words = vec!["abx", "ba", "ab", "lls", "s", "sssll", "dxba"];
     //let words = vec!["a", ""];
 
     let words = words.iter().map(|e| e.to_string()).collect();
