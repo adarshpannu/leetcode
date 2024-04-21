@@ -7,15 +7,15 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug executable 'rust101'",
+            "name": "Debug executable 'leetcode'",
             "cargo": {
                 "args": [
                     "build",
-                    "--bin=rust101",
-                    "--package=rust101"
+                    "--bin=leetcode",
+                    "--package=leetcode"
                 ],
                 "filter": {
-                    "name": "rust101",
+                    "name": "leetcode",
                     "kind": "bin"
                 }
             },
@@ -25,16 +25,16 @@
         {
             "type": "lldb",
             "request": "launch",
-            "name": "Debug unit tests in executable 'rust101'",
+            "name": "Debug unit tests in executable 'leetcode'",
             "cargo": {
                 "args": [
                     "test",
                     "--no-run",
-                    "--bin=rust101",
-                    "--package=rust101"
+                    "--bin=leetcode",
+                    "--package=leetcode"
                 ],
                 "filter": {
-                    "name": "rust101",
+                    "name": "leetcode",
                     "kind": "bin"
                 }
             },
