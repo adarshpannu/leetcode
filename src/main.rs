@@ -1,6 +1,6 @@
 #![allow(warnings)]
 
-mod lc1689_decbin_count;
+mod lc1302_deepest_leaves_sum;
 
 fn main() {
     println!("Hello, world!");
