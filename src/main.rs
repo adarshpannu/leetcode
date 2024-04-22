@@ -1,8 +1,7 @@
 #![allow(warnings)]
 
-mod lc88_merge_sorted_arrays;
+mod lc1689_decbin_count;
 
 fn main() {
     println!("Hello, world!");
-    lc88_merge_sorted_arrays::test();
 }
