@@ -2,36 +2,31 @@ use std::cell::RefCell;
 use std::rc::Rc;
 impl Solution {
     // Returns (sum, level) pair
-    pub fn deepest_leaves_sum_n_level(
-        node: Option<Rc<RefCell<TreeNode>>>,
-        curlevel: i32,
-    ) -> (i32, i32) {
-        if let Some(node) = node {
-            let node = &*node.borrow();
-            let (leftsum, leftlevel) =
-                Self::deepest_leaves_sum_n_level(node.left.clone(), curlevel + 1);
-            let (rightsum, rightlevel) =
-                Self::deepest_leaves_sum_n_level(node.right.clone(), curlevel + 1);
-
-            let retlevel = curlevel.max(leftlevel).max(rightlevel);
-            let mut retsum = 0;
-            if curlevel == retlevel {
-                retsum += node.val
-            };
-            if leftlevel == retlevel {
-                retsum += leftsum
-            };
-            if rightlevel == retlevel {
-                retsum += rightsum
-            };
-            return (retsum, retlevel);
+    pub fn deepest_leaves_sum_n_level(node: &TreeNode, curlevel: i32) -> (i32, i32) {
+        let (mut retsum, mut retlevel) = if let Some(node) = &node.left {
+            Self::deepest_leaves_sum_n_level(&*node.borrow(), curlevel + 1)
         } else {
-            return (0, 0);
+            (node.val, curlevel + 1)
+        };
+
+        if let Some(node) = &node.right {
+            let (rsum, rlevel) = Self::deepest_leaves_sum_n_level(&*node.borrow(), curlevel + 1);
+            if rlevel > retlevel {
+                (retsum, retlevel) = (rsum, rlevel)
+            } else if rlevel == retlevel {
+                retsum += rsum
+            }
         }
+
+        return (retsum, retlevel);
     }
 
     pub fn deepest_leaves_sum(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
-        Self::deepest_leaves_sum_n_level(root.clone(), 0).0
+        if let Some(node) = root {
+            Self::deepest_leaves_sum_n_level(&*node.borrow(), 0).0
+        } else {
+            0
+        }
     }
 }
 
