@@ -1,3 +1,4 @@
 {
-    "rust-analyzer.inlayHints.enable": true
+    "editor.inlayHints.enabled": "offUnlessPressed",
+    //"rust-analyzer.runnableEnv": {"PATH": "/Users/adarshrp/.cargo/bin"}
 }

@@ -1,7 +1,15 @@
 #![allow(warnings)]
 
-mod lc1302_deepest_leaves_sum;
+mod lc2_add_two_numbers;
 
 fn main() {
     println!("Hello, world!");
 }
+
+
+#[test]
+fn test0() {
+    println!("test0");
+}
+
+

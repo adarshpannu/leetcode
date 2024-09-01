@@ -3,7 +3,10 @@ use std::rc::Rc;
 impl Solution {
     pub fn deepest_leaves_sum(root: Option<Rc<RefCell<TreeNode>>>) -> i32 {
         if let Some(node) = root {
-            let mut stack = vec![(node, 0)];
+
+            let mut stack = Vec::with_capacity(512);
+            stack.push((node, 0));
+
             let mut max_level = 0;
             let mut sum = 0;
 
@@ -32,6 +35,8 @@ impl Solution {
         }
     }
 }
+
+
 #[test]
 pub fn test() {
     use Solution;
