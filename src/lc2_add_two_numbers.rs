@@ -55,14 +55,14 @@ impl Solution {
         curnode
     }
 
-    pub fn list_to_num(lst: Option<&Box<ListNode>>) -> i32 {
+    pub fn list_to_num(lst: Option<&ListNode>) -> i32 {
         let mut place_multiplier = 1;
         let mut num = 0;
         let mut lst = lst;
         while let Some(lst_node) = lst {
             num += (lst_node.val * place_multiplier);
             place_multiplier *= 10;
-            lst = lst_node.next.as_ref();
+            lst_node.next.as_ref().map(|e| &**e);
         }
         num
     }
